@@ -11,12 +11,12 @@ const NAV_ITEMS = ["Home", "About", "Features", "Inventory", "Contact"];
 // Extract showDesktopNav logic to a custom hook to avoid using hooks inside render
 function useShowDesktopNav() {
   const [showDesktopNav, setShowDesktopNav] = useState(
-    typeof window !== "undefined" ? window.innerWidth >= 768 : true
+    typeof window !== "undefined" ? window.innerWidth >= 1024 : true
   );
 
   useEffect(() => {
     function handleResize() {
-      setShowDesktopNav(window.innerWidth >= 768);
+      setShowDesktopNav(window.innerWidth >= 1024);
     }
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -130,7 +130,7 @@ const NavBar = () => {
     <div
       ref={navContainerRef}
       className={clsx(
-        "fixed left-0 right-0 top-4 z-50 transition-all duration-700 mx-10",
+        "fixed left-0 right-0 top-4 z-50 transition-all duration-700 mx-5 md:mx-36 lg:mx-10",
       )}
       style={{
         // Glass effect: semi-transparent, blur, border, subtle shadow
@@ -143,24 +143,29 @@ const NavBar = () => {
       }}
     >
       <header className="w-full">
-        <nav className="flex w-full h-16 items-center justify-between p-4 rounded-lg">
+        {/* 
+          Make nav bar height a little bit smaller for mobile and tablet.
+          - h-14 for mobile/tablet (default)
+          - h-16 for large screens (lg and up)
+        */}
+        <nav className="flex w-full h-9 md:h-12 lg:h-16 items-center justify-between p-2 lg:p-4 rounded-lg">
           {/* Logo */}
-          <div className="flex items-center gap-7">
+          <div className="flex items-center">
             <img
               ref={logoRef}
               src="/img/logo.avif"
-              alt="logo"
+              alt="Logo"
               className="w-[100px] h-auto filter invert"
               loading="lazy"
               decoding="async"
               style={{ filter: "invert(1) brightness(1.2)" }}
             />
           </div>
-          <div className="w-full flex items-center justify-end gap-6">
+          <div className="w-full flex items-center justify-end gap-5 lg:gap-6">
             {/* Desktop Navigation Links */}
             {/* Responsive Desktop Navigation Links */}
             {showDesktopNav && (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5 lg:gap-3">
                 {navLinks.map((item, index) => (
                   <a
                     key={item}
@@ -172,14 +177,14 @@ const NavBar = () => {
                     <Button
                       bullet={<GiClothesline />}
                       title={item}
-                      containerClass="bg-blue-50 px-4 py-2 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2"
+                      containerClass="bg-blue-50 px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2"
                     />
                   </a>
                 ))}
               </div>
             )}
             {/* Right side - Audio button and Mobile menu button */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 lg:gap-4">
               {/* Audio Button */}
               <button
                 ref={audioButtonRef}
@@ -210,7 +215,7 @@ const NavBar = () => {
               <button
                 ref={mobileMenuButtonRef}
                 onClick={toggleMobileMenu}
-                className="md:hidden p-2 rounded-md bg-blue-50 hover:bg-yellow-400 transition-colors duration-200"
+                className="lg:hidden md:p-1.5 rounded-md bg-blue-50 hover:bg-yellow-400 transition-colors duration-200"
                 aria-label="Toggle mobile menu"
                 type="button"
               >
@@ -243,11 +248,11 @@ const NavBar = () => {
         {/* Mobile Menu */}
         <div
           className={clsx(
-            "md:hidden mt-2 bg-black/55 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden transition-all duration-300",
+            "lg:hidden mt-2 bg-black/55 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden transition-all duration-300",
             isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           )}
         >
-          <div className="p-4 space-y-3">
+          <div className="p-3 space-y-2.5">
             {navLinks.map((item, idx) => (
               <a
                 key={item}
@@ -261,7 +266,7 @@ const NavBar = () => {
                 <Button
                   bullet={<GiClothesline />}
                   title={item}
-                  containerClass="bg-blue-50 w-full px-4 py-2 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2 justify-center"
+                  containerClass="bg-blue-50 w-full px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2 justify-center"
                 />
               </a>
             ))}

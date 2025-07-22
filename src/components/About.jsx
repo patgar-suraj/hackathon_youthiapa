@@ -11,7 +11,7 @@ const About = () => {
     const clipTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: "#clip",
-        start: "center center",
+        start: "top top",
         end: "+=800 center",
         scrub: 0.5,
         pin: true,
@@ -60,20 +60,24 @@ const About = () => {
     <section id="about" className="min-h-screen w-screen">
       <div className="relative mb-8 mt-36 flex flex-col items-center gap-5">
         <p className="welcomeTage font-general text-sm uppercase md:text-[20px]">
-        A new chapter
+          A new chapter
         </p>
 
+        {/* 
+          Fix: Use responsive text size for all breakpoints, not just md and up.
+          Tailwind: text-2xl for mobile, sm:text-4xl for small screens, md:text-6xl for medium and up.
+        */}
         <AnimatedTitle
           title="Exclusive->Look"
-          containerClass="mt-5 !text-black text-center"
+          containerClass="mt-5 !text-black text-center p-10 text-2xl sm:text-4xl md:text-6xl"
         />
 
         <div className="about-subtext">
           <p>
-          We’re built on respect, responsibility, and resilience.
+            We’re built on respect, responsibility, and resilience.
           </p>
           <p className="fadeLine text-gray-500">
-          So when you wear Raised Right, you're repping more than style—you're repping values that matter.
+            So when you wear Raised Right, you're repping more than style—you're repping values that matter.
           </p>
         </div>
       </div>

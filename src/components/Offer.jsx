@@ -49,6 +49,11 @@ const ComboImage = memo(({ src, alt }) => {
 });
 ComboImage.displayName = "ComboImage";
 
+const isMobileOrTablet = () => {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth < 1024; // <lg
+};
+
 const Offer = () => {
   // Main images carousel (swipe after 2 seconds infinitely)
   const mainRef = useRef(null);
@@ -61,11 +66,23 @@ const Offer = () => {
   // Coupon scroll
   const couponRef = useRef(null);
 
+  // Track device type for responsive logic
+  const [isMobileTablet, setIsMobileTablet] = useState(isMobileOrTablet());
+
   // Helper to get offset for carousels
   const getOffset = (el, gap) => {
     const child = el?.children[0];
     return child ? child.offsetWidth + gap : 0;
   };
+
+  // Listen for resize to update device type
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileTablet(isMobileOrTablet());
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Animate main images: swipe after 2 seconds infinitely
   useEffect(() => {
@@ -105,7 +122,14 @@ const Offer = () => {
     // eslint-disable-next-line
   }, [mainIndex]);
 
-  // Animate combo images: swipe left/right on button click, smooth
+  // --- Combo carousel logic ---
+
+  // Touch/drag state for mobile/tablet
+  const touchStartX = useRef(0);
+  const touchCurrentX = useRef(0);
+  const isDragging = useRef(false);
+
+  // Animate combo images: swipe left/right on button click, smooth (desktop only)
   const handleComboLeft = useCallback(() => {
     if (!comboRef.current) return;
     setComboIndex((prev) => {
@@ -136,7 +160,101 @@ const Offer = () => {
     });
   }, []);
 
-  // Reset combo position on mount
+  // Touch/drag handlers for mobile/tablet
+  useEffect(() => {
+    if (!isMobileTablet) return; // Only for mobile/tablet
+    const el = comboRef.current;
+    if (!el) return;
+
+    let animationFrame;
+    let startX = 0;
+    let lastX = 0;
+    let dragging = false;
+    let initialComboIndex = comboIndex;
+
+    const maxIndex = COMBO_IMAGES.length - 3;
+
+    const getComboOffset = () => getOffset(el, 40);
+
+    const onTouchStart = (e) => {
+      dragging = true;
+      isDragging.current = true;
+      startX = e.touches ? e.touches[0].clientX : e.clientX;
+      lastX = startX;
+      initialComboIndex = comboIndex;
+      el.style.cursor = "grabbing";
+    };
+
+    const onTouchMove = (e) => {
+      if (!dragging) return;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const deltaX = clientX - startX;
+      lastX = clientX;
+      const offset = getComboOffset();
+      // Move the carousel visually
+      gsap.set(el, { x: -initialComboIndex * offset + deltaX });
+    };
+
+    const onTouchEnd = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      isDragging.current = false;
+      el.style.cursor = "";
+      const clientX = e.changedTouches
+        ? e.changedTouches[0].clientX
+        : lastX;
+      const deltaX = clientX - startX;
+      const offset = getComboOffset();
+      let newIndex = initialComboIndex;
+
+      // Threshold: swipe at least 50px to change slide
+      if (deltaX > 50) {
+        newIndex = Math.max(0, initialComboIndex - 1);
+      } else if (deltaX < -50) {
+        newIndex = Math.min(maxIndex, initialComboIndex + 1);
+      }
+
+      setComboIndex((prev) => {
+        gsap.to(el, {
+          x: -newIndex * offset,
+          duration: 0.5,
+          ease: "power2.inOut",
+        });
+        return newIndex;
+      });
+    };
+
+    // Mouse events for desktop touchpad
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    el.addEventListener("mousedown", onTouchStart);
+    window.addEventListener("mousemove", onTouchMove);
+    window.addEventListener("mouseup", onTouchEnd);
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("mousedown", onTouchStart);
+      window.removeEventListener("mousemove", onTouchMove);
+      window.removeEventListener("mouseup", onTouchEnd);
+    };
+    // eslint-disable-next-line
+  }, [isMobileTablet, comboIndex]);
+
+  // Reset combo position on mount or comboIndex change
+  useEffect(() => {
+    if (!comboRef.current) return;
+    const el = comboRef.current;
+    const offset = getOffset(el, 40);
+    gsap.to(el, {
+      x: -comboIndex * offset,
+      duration: 0.5,
+      ease: "power2.inOut",
+    });
+  }, [comboIndex]);
+
   useEffect(() => {
     if (!comboRef.current) return;
     gsap.set(comboRef.current, { x: 0 });
@@ -184,9 +302,9 @@ const Offer = () => {
   }, []);
 
   return (
-    <div id="offer" className="w-screen h-auto p-10 overflow-hidden">
+    <div id="offer" className="w-screen h-auto p-3 md:p-10 overflow-hidden">
       {/* Main images carousel */}
-      <div className="main flex gap-10 w-full overflow-hidden min-h-0">
+      <div className="main flex gap-10 w-full h-auto overflow-hidden rounded-2xl">
         <div
           ref={mainRef}
           className="flex gap-10 w-full will-change-transform"
@@ -196,7 +314,7 @@ const Offer = () => {
               key={src}
               src={src}
               alt={`main${i + 2}`}
-              className="rounded-3xl min-w-0 w-auto flex-shrink-0 object-cover block"
+              className="rounded-3xl min-w-0 w-auto flex-shrink-0 object-contain block"
               loading="lazy"
               draggable={false}
             />
@@ -205,7 +323,7 @@ const Offer = () => {
       </div>
 
       {/* Centered Super Saving Combos and Loved by Peoples */}
-      <div className="w-full flex flex-col items-center justify-center m-10">
+      <div className="w-full flex flex-col items-center justify-center px-10 lg:py-10 py-4">
         <div className="w-full flex flex-col items-center justify-center">
           <h1
             className="font-bold font-general mb-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-center w-full flex items-center justify-center"
@@ -221,48 +339,58 @@ const Offer = () => {
       </div>
 
       {/* Combo images carousel */}
-      <div className="relative w-full flex items-center justify-center px-10 md:px-20">
-        <div
-          className="absolute left-0 text-xl md:text-3xl p-2 md:px-3 bg-white rounded-tl-2xl rounded-bl-3xl rounded-tr-3xl rounded-br-xl z-10"
-          onClick={handleComboLeft}
-          tabIndex={0}
-          aria-label="Previous"
-          role="button"
-        >
-          <TbArrowLoopLeft />
-        </div>
+      <div className="relative w-full flex items-center justify-center md:px-20">
+        {/* Show buttons only on desktop (lg and up) */}
+        {!isMobileTablet && (
+          <div
+            className="absolute left-0 text-xl md:text-3xl p-2 md:px-3 bg-white rounded-tl-2xl rounded-bl-3xl rounded-tr-3xl rounded-br-xl z-10"
+            onClick={handleComboLeft}
+            tabIndex={0}
+            aria-label="Previous"
+            role="button"
+          >
+            <TbArrowLoopLeft />
+          </div>
+        )}
         <div className="combo w-full overflow-hidden flex gap-10 rounded-3xl min-h-0">
           <div
             ref={comboRef}
-            className="flex gap-8 md:gap-10 will-change-transform"
+            className="flex gap-2 md:gap-10 will-change-transform touch-pan-x select-none"
+            style={{
+              cursor: isMobileTablet ? "grab" : undefined,
+              WebkitOverflowScrolling: isMobileTablet ? "touch" : undefined,
+            }}
           >
             {COMBO_IMAGES.map((src, i) => (
               <ComboImage key={src} src={src} alt={String(i + 1)} />
             ))}
           </div>
         </div>
-        <div
-          className="absolute right-0 text-xl md:text-3xl p-2 md:px-3 bg-white rounded-tl-2xl rounded-bl-3xl rounded-tr-3xl rounded-br-xl z-10"
-          onClick={handleComboRight}
-          tabIndex={0}
-          aria-label="Next"
-          role="button"
-        >
-          <TbArrowIteration />
-        </div>
+        {/* Show buttons only on desktop (lg and up) */}
+        {!isMobileTablet && (
+          <div
+            className="absolute right-0 text-xl md:text-3xl p-2 md:px-3 bg-white rounded-tl-2xl rounded-bl-3xl rounded-tr-3xl rounded-br-xl z-10"
+            onClick={handleComboRight}
+            tabIndex={0}
+            aria-label="Next"
+            role="button"
+          >
+            <TbArrowIteration />
+          </div>
+        )}
       </div>
 
       {/* Coupon infinite scroll */}
       <div className="w-full flex items-center justify-center mt-10 gap-2 md:gap-10 bg-[#212121] p-2 md:p-3 rounded-xl">
         <div>
-          <h2 className="text-sm md:text-xl md:font-bold font-robert-medium text-white">
+          <h2 className="text-[10px] md:text-xl md:font-bold font-robert-medium text-white">
             <BiSolidDiscount />
             SPECIAL <br />
             COUPON <br />
             CORNER
           </h2>
         </div>
-        <div className="coupon flex bg-white rounded-xl p-3 overflow-hidden gap-5 min-w-0 relative">
+        <div className="coupon flex bg-white rounded-xl p-2 md:p-3 overflow-hidden gap-5 min-w-0 relative">
           <div
             ref={couponRef}
             className="flex gap-5 will-change-transform min-w-0"

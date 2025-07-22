@@ -5,7 +5,7 @@ import Button from "./Button";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const FloatingImage = () => {
+const HoodieSec = () => {
   const frameRef = useRef(null);
   const titleRef = useRef(null);
 
@@ -68,11 +68,11 @@ const FloatingImage = () => {
 
   return (
     <div
-      id="story"
+      id="hoodie"
       className="relative h-auto w-full text-blue-50 py-6"
     >
       <img
-        src="/img/storybg2.jpg"
+        src="/img/hoodiebg.jpg"
         alt="appBg"
         className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none select-none"
         style={{ zIndex: 0 }}
@@ -174,4 +174,4 @@ const FloatingImage = () => {
   );
 };
 
-export default FloatingImage;
+export default HoodieSec;
