@@ -197,12 +197,16 @@ const ProductDetails = () => {
         
       </div>
       {/* Size image always below for all devices */}
-      <div className="w-full md:px-10 my-10 flex items-start justify-start">
+      <div className="w-full md:px-10 my-10 gap-10 flex flex-col md:flex-row items-start justify-start">
           <img
             src="/productsImg/s_5.webp"
             alt=""
             className="md:w-1/2 lg:w-1/4 lg:ml-36"
           />
+        <div className="flex w-full items-center justify-center gap-4">
+            <img src="/productsImg/madein.webp" alt="" className="lg:w-40 md:w-20 w-10" />
+            <img src="/productsImg/refund.webp" alt="" className="lg:w-40 md:w-20 w-10" />
+        </div>
         </div>
     </section>
   );

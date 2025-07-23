@@ -124,7 +124,6 @@ const Offer = () => {
   }, [mainIndex]);
 
   // --- Combo carousel: infinite only on button click/drag ---
-
   // We'll keep a state for the current visible index (virtual, for infinite)
   const [comboIndex, setComboIndex] = useState(0);
   const [comboImages, setComboImages] = useState([...COMBO_IMAGES]);
@@ -137,6 +136,14 @@ const Offer = () => {
     return child ? child.offsetWidth + 40 : 0;
   }, []);
 
+  // Helper to get how many images are visible in viewport (for mobile/tablet)
+  const getVisibleCount = useCallback(() => {
+    if (typeof window === "undefined") return 1;
+    if (window.innerWidth < 640) return 1; // mobile
+    if (window.innerWidth < 1024) return 2; // tablet
+    return 4; // desktop fallback
+  }, []);
+
   // When window resizes, reset position
   useEffect(() => {
     if (!comboRef.current) return;
@@ -145,66 +152,153 @@ const Offer = () => {
     setComboImages([...COMBO_IMAGES]);
   }, [isMobileTablet]);
 
-  // Infinite scroll logic for combo: only on button click/drag
-  // When moving right, if at end, append first image to end and shift left
-  // When moving left, if at start, prepend last image to start and shift right
+  // --- FIX: Combo carousel logic for mobile/tablet ---
+  // For desktop, keep old logic (swap 1 image). For mobile/tablet, use a "cloned" carousel for seamless infinite scroll.
+  // We'll prepend/append clones and animate, then remove clones after transition for smoothness.
 
+  // Helper to clone images for mobile/tablet infinite scroll
+  const getClonedComboImages = (images, visibleCount) => {
+    // For seamless infinite scroll, clone last N to front and first N to end
+    const head = images.slice(-visibleCount);
+    const tail = images.slice(0, visibleCount);
+    return [...head, ...images, ...tail];
+  };
+
+  // State for cloned images (only used in mobile/tablet)
+  const [clonedComboImages, setClonedComboImages] = useState([]);
+  // Track current index (for cloned array, start at visibleCount)
+  const [clonedIndex, setClonedIndex] = useState(0);
+
+  // Setup cloned images for mobile/tablet
+  useEffect(() => {
+    if (!isMobileTablet) return;
+    const visibleCount = getVisibleCount();
+    setClonedComboImages(getClonedComboImages(COMBO_IMAGES, visibleCount));
+    setClonedIndex(visibleCount);
+    // Reset position
+    if (comboRef.current) {
+      gsap.set(comboRef.current, { x: -getComboOffset() * visibleCount });
+    }
+    // eslint-disable-next-line
+  }, [isMobileTablet]);
+
+  // Desktop: handleComboRight/Left as before (swap 1 image)
+  // Mobile/Tablet: animate to next/prev, then reset position and index for seamless effect
   const handleComboRight = useCallback(() => {
     if (!comboRef.current || comboAnimatingRef.current) return;
     comboAnimatingRef.current = true;
 
+    if (!isMobileTablet) {
+      // Desktop: old logic (swap 1 image)
+      const el = comboRef.current;
+      const offset = getComboOffset();
+      gsap.to(el, {
+        x: `-=${offset}`,
+        duration: 0.7,
+        ease: "power2.inOut",
+        onComplete: () => {
+          setComboImages((prev) => {
+            const newArr = [...prev];
+            const first = newArr.shift();
+            newArr.push(first);
+            gsap.set(el, { x: 0 });
+            comboAnimatingRef.current = false;
+            return newArr;
+          });
+        },
+      });
+      return;
+    }
+
+    // Mobile/Tablet: use cloned images and index
+    const visibleCount = getVisibleCount();
     const el = comboRef.current;
     const offset = getComboOffset();
-
-    // Animate left by one image
+    // Animate to next set
     gsap.to(el, {
-      x: `-=${offset}`,
+      x: `-=${offset * visibleCount}`,
       duration: 0.7,
       ease: "power2.inOut",
       onComplete: () => {
-        // After animation, if at end, move first image to end and reset x
-        setComboImages((prev) => {
-          const newArr = [...prev];
-          const first = newArr.shift();
-          newArr.push(first);
-          // Instantly reset x to 0 for seamless effect
-          gsap.set(el, { x: 0 });
+        setClonedIndex((prev) => {
+          const newIndex = prev + visibleCount;
+          // If at end of real images, reset to real start
+          if (newIndex >= COMBO_IMAGES.length + visibleCount) {
+            // Instantly jump to real start
+            gsap.set(el, { x: -offset * visibleCount });
+            comboAnimatingRef.current = false;
+            return visibleCount;
+          }
           comboAnimatingRef.current = false;
-          return newArr;
+          return newIndex;
         });
       },
     });
-  }, [getComboOffset]);
+  }, [getComboOffset, getVisibleCount, isMobileTablet]);
 
   const handleComboLeft = useCallback(() => {
     if (!comboRef.current || comboAnimatingRef.current) return;
     comboAnimatingRef.current = true;
 
+    if (!isMobileTablet) {
+      // Desktop: old logic (swap 1 image)
+      const el = comboRef.current;
+      const offset = getComboOffset();
+      setComboImages((prev) => {
+        const newArr = [...prev];
+        const last = newArr.pop();
+        newArr.unshift(last);
+        gsap.set(el, { x: -offset });
+        gsap.to(el, {
+          x: 0,
+          duration: 0.7,
+          ease: "power2.inOut",
+          onComplete: () => {
+            comboAnimatingRef.current = false;
+          },
+        });
+        return newArr;
+      });
+      return;
+    }
+
+    // Mobile/Tablet: use cloned images and index
+    const visibleCount = getVisibleCount();
     const el = comboRef.current;
     const offset = getComboOffset();
-
-    // Before animation, move last image to front and shift x instantly
-    setComboImages((prev) => {
-      const newArr = [...prev];
-      const last = newArr.pop();
-      newArr.unshift(last);
-      // Instantly shift x to -offset so that animating to 0 slides right
-      gsap.set(el, { x: -offset });
-      // Animate to x: 0
-      gsap.to(el, {
-        x: 0,
-        duration: 0.7,
-        ease: "power2.inOut",
-        onComplete: () => {
+    // Animate to prev set
+    gsap.to(el, {
+      x: `+=${offset * visibleCount}`,
+      duration: 0.7,
+      ease: "power2.inOut",
+      onComplete: () => {
+        setClonedIndex((prev) => {
+          const newIndex = prev - visibleCount;
+          // If at start of real images, reset to real end
+          if (newIndex < visibleCount) {
+            // Instantly jump to real end
+            gsap.set(el, { x: -offset * (COMBO_IMAGES.length) });
+            comboAnimatingRef.current = false;
+            return COMBO_IMAGES.length;
+          }
           comboAnimatingRef.current = false;
-        },
-      });
-      return newArr;
+          return newIndex;
+        });
+      },
     });
-  }, [getComboOffset]);
+  }, [getComboOffset, getVisibleCount, isMobileTablet]);
+
+  // Keep comboRef x in sync with clonedIndex (for mobile/tablet)
+  useEffect(() => {
+    if (!isMobileTablet) return;
+    const visibleCount = getVisibleCount();
+    if (!comboRef.current) return;
+    const offset = getComboOffset();
+    gsap.set(comboRef.current, { x: -offset * clonedIndex });
+    // eslint-disable-next-line
+  }, [clonedIndex, isMobileTablet]);
 
   // Touch/drag support for combo carousel
-  // Only allow horizontal drag, and on drag end, snap to next/prev image and do infinite logic
   useEffect(() => {
     const el = comboRef.current;
     if (!el) return;
@@ -232,7 +326,8 @@ const Offer = () => {
       if (!dragging) return;
       dragging = false;
       const offset = getComboOffset();
-      if (Math.abs(dragOffset) > offset / 3) {
+      const visibleCount = isMobileTablet ? getVisibleCount() : 1;
+      if (Math.abs(dragOffset) > (offset * visibleCount) / 3) {
         if (dragOffset < 0) {
           handleComboRight();
         } else {
@@ -240,7 +335,7 @@ const Offer = () => {
         }
       } else {
         // Snap back
-        gsap.to(el, { x: 0, duration: 0.3, ease: "power2.out" });
+        gsap.to(el, { x: isMobileTablet ? -offset * (isMobileTablet ? (isMobileTablet ? (clonedIndex || getVisibleCount()) : 0) : 0) : 0, duration: 0.3, ease: "power2.out" });
       }
       dragOffset = 0;
     };
@@ -260,7 +355,8 @@ const Offer = () => {
       window.removeEventListener("mouseup", onPointerUp);
       window.removeEventListener("touchend", onPointerUp);
     };
-  }, [handleComboLeft, handleComboRight, getComboOffset]);
+    // eslint-disable-next-line
+  }, [handleComboLeft, handleComboRight, getComboOffset, getVisibleCount, isMobileTablet, clonedIndex]);
 
   // Coupon infinite scroll (unchanged)
   useEffect(() => {
@@ -349,7 +445,7 @@ const Offer = () => {
             tabIndex={0}
             aria-label="Previous"
             role="button"
-            style={{ cursor: "default" }}
+            style={{ cursor: "none" }}
           >
             <TbArrowLoopLeft className="group-active:scale-95" />
           </div>
@@ -362,9 +458,20 @@ const Offer = () => {
               WebkitOverflowScrolling: "touch",
             }}
           >
-            {comboImages.map((src, i) => (
-              <ComboImage key={i + "-" + src} src={src} alt={String(i + 1)} />
-            ))}
+            {!isMobileTablet
+              ? comboImages.map((src, i) => (
+                  <ComboImage key={i + "-" + src} src={src} alt={String(i + 1)} />
+                ))
+              : (() => {
+                  // Only show the visible window of images for mobile/tablet
+                  const visibleCount = getVisibleCount();
+                  // If not enough images, fallback
+                  if (!clonedComboImages.length) return null;
+                  // Show all cloned images (with overflow hidden, only visibleCount will show)
+                  return clonedComboImages.map((src, i) => (
+                    <ComboImage key={i + "-" + src} src={src} alt={String(i + 1)} />
+                  ));
+                })()}
           </div>
         </div>
         {!isMobileTablet && (
@@ -374,7 +481,7 @@ const Offer = () => {
             tabIndex={0}
             aria-label="Next"
             role="button"
-            style={{ cursor: "default" }}
+            style={{ cursor: "none" }}
           >
             <TbArrowIteration className="group-active:scale-95" />
           </div>

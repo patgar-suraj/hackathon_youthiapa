@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useNavigate } from "react-router-dom";
 
 // Register GSAP plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -35,6 +36,7 @@ const About = () => {
   const founderRef = useRef(null);
   const heroRef = useRef(null);
   const scribbleRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Headline fade-in
@@ -238,6 +240,10 @@ const About = () => {
           className="mt-10 inline-block group relative"
           tabIndex={0}
           aria-label="Shop the collection"
+          onClick={e => {
+            e.preventDefault();
+            navigate("/products");
+          }}
           onMouseEnter={e => {
             gsap.to(e.currentTarget, { scale: 1.06, boxShadow: "0 8px 32px #eab30844", duration: 0.3, ease: "power2.out" });
           }}
