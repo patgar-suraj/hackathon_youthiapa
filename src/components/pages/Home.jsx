@@ -155,20 +155,33 @@ const Home = () => {
     return `/videos/hero-${index}.mp4`;
   };
 
+  // Responsive: always show minivideo player in small size on mobile/tablet
+  // We'll use Tailwind's responsive classes to always show the minivideo player in small size on mobile/tablet,
+  // and only allow the hover/scale-up effect on large screens (lg: and up).
+  // We'll also ensure the minivideo player is always visible (opacity-100, scale-100) on mobile/tablet.
+
   return (
-    <div id="home" className="relative h-dvh w-screen overflow-x-hidden">
+    <div id="home" className="relative h-dvh w-full overflow-x-hidden">
       <img src="/comboImg/offerbg.webp" alt="offerBg" className="absolute top-0 left-0 w-full h-full object-cover opacity-5 z-[-10]" />
       <div
         id="video-frame"
         className="relative z-10 h-dvh w-screen overflow-hidden rounded-lg bg-blue-75 "
       >
         <div>
-          {/* Make the minivideoplayer shape round by using rounded-full */}
-          <div className="mask-clip-path absolute-center absolute z-50 size-64 overflow-hidden rounded-full">
+          {/* Responsive minivideoplayer: always visible and small on mobile/tablet, hover/scale on desktop */}
+          <div className="mask-clip-path absolute-center absolute z-50 size-40 sm:size-48 md:size-56 lg:size-64 overflow-hidden rounded-full">
             <VideoPreview>
               <div
                 onClick={handleMiniVdClick}
-                className="origin-center scale-50 opacity-0 transition-all duration-500 ease-in hover:scale-100 hover:opacity-100 rounded-full overflow-hidden"
+                className={`
+                  origin-center
+                  scale-100 opacity-100
+                  transition-all duration-500 ease-in
+                  rounded-full overflow-hidden
+                  cursor-pointer
+                  lg:scale-50 lg:opacity-0
+                  lg:hover:scale-100 lg:hover:opacity-100
+                `}
               >
                 <video
                   ref={nextVdRef}
@@ -176,7 +189,7 @@ const Home = () => {
                   loop
                   muted
                   id="current-video"
-                  className="size-64 origin-center scale-150 object-cover object-center rounded-full"
+                  className="size-40 sm:size-48 md:size-56 lg:size-64 origin-center scale-150 object-cover object-center rounded-full"
                 />
               </div>
             </VideoPreview>
@@ -188,7 +201,7 @@ const Home = () => {
             loop
             muted
             id="next-video"
-            className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
+            className="absolute-center invisible absolute z-20 size-40 sm:size-48 md:size-56 lg:size-64 object-cover object-center"
           />
           <video
             src={getVideoSrc(

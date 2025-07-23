@@ -1,8 +1,8 @@
-import { useRef, useEffect, useState, useCallback, memo } from "react";
 import { BiSolidDiscount } from "react-icons/bi";
 import { TbArrowLoopLeft, TbArrowIteration } from "react-icons/tb";
 import gsap from "gsap";
 import { MAIN_IMAGES, COMBO_IMAGES, COUPON_IMAGES } from "../OfferData";
+import { useRef, useState, useEffect, useCallback, memo } from "react";
 
 // Memoized ComboImage for performance
 const ComboImage = memo(({ src, alt }) => {
@@ -63,7 +63,6 @@ const Offer = () => {
 
   // Combo images carousel
   const comboRef = useRef(null);
-  const [comboIndex, setComboIndex] = useState(0);
 
   // Coupon scroll
   const couponRef = useRef(null);
@@ -124,133 +123,146 @@ const Offer = () => {
     // eslint-disable-next-line
   }, [mainIndex]);
 
-  // --- Combo carousel logic ---
+  // --- Combo carousel: infinite only on button click/drag ---
 
-  // Touch/drag state for mobile/tablet
-  const touchStartX = useRef(0);
-  const touchCurrentX = useRef(0);
-  const isDragging = useRef(false);
+  // We'll keep a state for the current visible index (virtual, for infinite)
+  const [comboIndex, setComboIndex] = useState(0);
+  const [comboImages, setComboImages] = useState([...COMBO_IMAGES]);
+  const comboAnimatingRef = useRef(false);
 
-  // --- FIX: Prevent jerking after slide on button click ---
-  // We'll only animate in the comboIndex effect, and NOT in the button handlers.
-  // The button handlers will just update comboIndex.
-
-  const handleComboLeft = useCallback(() => {
-    if (!comboRef.current) return;
-    setComboIndex((prev) => {
-      const next = prev <= 0 ? 0 : prev - 1;
-      return next;
-    });
+  // Helper to get offset for combo carousel
+  const getComboOffset = useCallback(() => {
+    if (!comboRef.current) return 0;
+    const child = comboRef.current.children[0];
+    return child ? child.offsetWidth + 40 : 0;
   }, []);
 
-  const handleComboRight = useCallback(() => {
-    if (!comboRef.current) return;
-    setComboIndex((prev) => {
-      // Show max 4 images at a time, so max index = images.length - 4
-      const max = COMBO_IMAGES.length - 3;
-      const next = prev >= max ? max : prev + 1;
-      return next;
-    });
-  }, []);
-
-  // Touch/drag handlers for mobile/tablet
-  useEffect(() => {
-    if (!isMobileTablet) return; // Only for mobile/tablet
-    const el = comboRef.current;
-    if (!el) return;
-
-    let animationFrame;
-    let startX = 0;
-    let lastX = 0;
-    let dragging = false;
-    let initialComboIndex = comboIndex;
-
-    const maxIndex = COMBO_IMAGES.length - 3;
-
-    const getComboOffset = () => getOffset(el, 40);
-
-    const onTouchStart = (e) => {
-      dragging = true;
-      isDragging.current = true;
-      startX = e.touches ? e.touches[0].clientX : e.clientX;
-      lastX = startX;
-      initialComboIndex = comboIndex;
-      el.style.cursor = "grabbing";
-    };
-
-    const onTouchMove = (e) => {
-      if (!dragging) return;
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const deltaX = clientX - startX;
-      lastX = clientX;
-      const offset = getComboOffset();
-      // Move the carousel visually
-      gsap.set(el, { x: -initialComboIndex * offset + deltaX });
-    };
-
-    const onTouchEnd = (e) => {
-      if (!dragging) return;
-      dragging = false;
-      isDragging.current = false;
-      el.style.cursor = "";
-      const clientX = e.changedTouches
-        ? e.changedTouches[0].clientX
-        : lastX;
-      const deltaX = clientX - startX;
-      const offset = getComboOffset();
-      let newIndex = initialComboIndex;
-
-      // Threshold: swipe at least 50px to change slide
-      if (deltaX > 50) {
-        newIndex = Math.max(0, initialComboIndex - 1);
-      } else if (deltaX < -50) {
-        newIndex = Math.min(maxIndex, initialComboIndex + 1);
-      }
-
-      setComboIndex((prev) => {
-        return newIndex;
-      });
-    };
-
-    // Mouse events for desktop touchpad
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-    el.addEventListener("mousedown", onTouchStart);
-    window.addEventListener("mousemove", onTouchMove);
-    window.addEventListener("mouseup", onTouchEnd);
-
-    return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("mousedown", onTouchStart);
-      window.removeEventListener("mousemove", onTouchMove);
-      window.removeEventListener("mouseup", onTouchEnd);
-    };
-    // eslint-disable-next-line
-  }, [isMobileTablet, comboIndex]);
-
-  // Animate combo position on comboIndex change (for both button and drag)
-  useEffect(() => {
-    if (!comboRef.current) return;
-    const el = comboRef.current;
-    const offset = getOffset(el, 40);
-    gsap.to(el, {
-      x: -comboIndex * offset,
-      duration: 0.7,
-      ease: "power2.inOut",
-    });
-  }, [comboIndex]);
-
-  // Reset combo position on mount
+  // When window resizes, reset position
   useEffect(() => {
     if (!comboRef.current) return;
     gsap.set(comboRef.current, { x: 0 });
     setComboIndex(0);
-  }, []);
+    setComboImages([...COMBO_IMAGES]);
+  }, [isMobileTablet]);
 
-  // Animate coupon images: infinite smooth scroll, low speed
+  // Infinite scroll logic for combo: only on button click/drag
+  // When moving right, if at end, append first image to end and shift left
+  // When moving left, if at start, prepend last image to start and shift right
+
+  const handleComboRight = useCallback(() => {
+    if (!comboRef.current || comboAnimatingRef.current) return;
+    comboAnimatingRef.current = true;
+
+    const el = comboRef.current;
+    const offset = getComboOffset();
+
+    // Animate left by one image
+    gsap.to(el, {
+      x: `-=${offset}`,
+      duration: 0.7,
+      ease: "power2.inOut",
+      onComplete: () => {
+        // After animation, if at end, move first image to end and reset x
+        setComboImages((prev) => {
+          const newArr = [...prev];
+          const first = newArr.shift();
+          newArr.push(first);
+          // Instantly reset x to 0 for seamless effect
+          gsap.set(el, { x: 0 });
+          comboAnimatingRef.current = false;
+          return newArr;
+        });
+      },
+    });
+  }, [getComboOffset]);
+
+  const handleComboLeft = useCallback(() => {
+    if (!comboRef.current || comboAnimatingRef.current) return;
+    comboAnimatingRef.current = true;
+
+    const el = comboRef.current;
+    const offset = getComboOffset();
+
+    // Before animation, move last image to front and shift x instantly
+    setComboImages((prev) => {
+      const newArr = [...prev];
+      const last = newArr.pop();
+      newArr.unshift(last);
+      // Instantly shift x to -offset so that animating to 0 slides right
+      gsap.set(el, { x: -offset });
+      // Animate to x: 0
+      gsap.to(el, {
+        x: 0,
+        duration: 0.7,
+        ease: "power2.inOut",
+        onComplete: () => {
+          comboAnimatingRef.current = false;
+        },
+      });
+      return newArr;
+    });
+  }, [getComboOffset]);
+
+  // Touch/drag support for combo carousel
+  // Only allow horizontal drag, and on drag end, snap to next/prev image and do infinite logic
+  useEffect(() => {
+    const el = comboRef.current;
+    if (!el) return;
+
+    let startX = 0;
+    let currentX = 0;
+    let dragging = false;
+    let dragOffset = 0;
+
+    const onPointerDown = (e) => {
+      if (comboAnimatingRef.current) return;
+      dragging = true;
+      startX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+      currentX = gsap.getProperty(el, "x");
+    };
+
+    const onPointerMove = (e) => {
+      if (!dragging) return;
+      const clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+      dragOffset = clientX - startX;
+      gsap.set(el, { x: currentX + dragOffset });
+    };
+
+    const onPointerUp = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      const offset = getComboOffset();
+      if (Math.abs(dragOffset) > offset / 3) {
+        if (dragOffset < 0) {
+          handleComboRight();
+        } else {
+          handleComboLeft();
+        }
+      } else {
+        // Snap back
+        gsap.to(el, { x: 0, duration: 0.3, ease: "power2.out" });
+      }
+      dragOffset = 0;
+    };
+
+    el.addEventListener("mousedown", onPointerDown);
+    el.addEventListener("touchstart", onPointerDown, { passive: false });
+    window.addEventListener("mousemove", onPointerMove);
+    window.addEventListener("touchmove", onPointerMove, { passive: false });
+    window.addEventListener("mouseup", onPointerUp);
+    window.addEventListener("touchend", onPointerUp);
+
+    return () => {
+      el.removeEventListener("mousedown", onPointerDown);
+      el.removeEventListener("touchstart", onPointerDown);
+      window.removeEventListener("mousemove", onPointerMove);
+      window.removeEventListener("touchmove", onPointerMove);
+      window.removeEventListener("mouseup", onPointerUp);
+      window.removeEventListener("touchend", onPointerUp);
+    };
+  }, [handleComboLeft, handleComboRight, getComboOffset]);
+
+  // Coupon infinite scroll (unchanged)
   useEffect(() => {
     if (!couponRef.current) return;
     const el = couponRef.current;
@@ -329,7 +341,7 @@ const Offer = () => {
 
       {/* Combo images carousel */}
       <div className="relative w-full flex items-center justify-center md:px-20">
-        {/* Show buttons only on desktop (lg and up) */}
+        {/* Show buttons only on desktop */}
         {!isMobileTablet && (
           <div
             className="group absolute left-0 text-xl md:text-3xl p-2 md:px-3 bg-white active:bg-yellow-200 transition-all duration-200 rounded-tl-2xl rounded-bl-3xl rounded-tr-3xl rounded-br-xl z-10"
@@ -337,6 +349,7 @@ const Offer = () => {
             tabIndex={0}
             aria-label="Previous"
             role="button"
+            style={{ cursor: "default" }}
           >
             <TbArrowLoopLeft className="group-active:scale-95" />
           </div>
@@ -346,16 +359,14 @@ const Offer = () => {
             ref={comboRef}
             className="flex gap-2 md:gap-10 will-change-transform touch-pan-x select-none"
             style={{
-              cursor: isMobileTablet ? "grab" : undefined,
-              WebkitOverflowScrolling: isMobileTablet ? "touch" : undefined,
+              WebkitOverflowScrolling: "touch",
             }}
           >
-            {COMBO_IMAGES.map((src, i) => (
-              <ComboImage key={src} src={src} alt={String(i + 1)} />
+            {comboImages.map((src, i) => (
+              <ComboImage key={i + "-" + src} src={src} alt={String(i + 1)} />
             ))}
           </div>
         </div>
-        {/* Show buttons only on desktop (lg and up) */}
         {!isMobileTablet && (
           <div
             className="group absolute right-0 text-xl md:text-3xl p-2 md:px-3 bg-white active:bg-yellow-200 transition-all duration-200 rounded-tl-2xl rounded-bl-3xl rounded-tr-3xl rounded-br-xl z-10"
@@ -363,6 +374,7 @@ const Offer = () => {
             tabIndex={0}
             aria-label="Next"
             role="button"
+            style={{ cursor: "default" }}
           >
             <TbArrowIteration className="group-active:scale-95" />
           </div>
