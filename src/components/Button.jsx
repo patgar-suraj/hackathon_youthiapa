@@ -16,7 +16,7 @@ const Button = ({ id, title, rightIcon, leftIcon, containerClass, bullet }) => {
     >
       {leftIcon}
 
-      <span className="relative inline-flex overflow-hidden justify-center items-center font-general text-xs uppercase gap-1">
+      <span className="relative inline-flex overflow-hidden justify-center items-center font-squid text-xs uppercase gap-1">
         <div className="translate-y-0 skew-y-0 transition duration-500 group-hover:translate-y-[-160%] group-hover:skew-y-12">
           {title}
         </div>

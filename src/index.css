@@ -41,34 +41,39 @@ body {
 */
 @layer base {
   @font-face {
-    font-family: "circular-web";
+    font-family: "long_shot";
+    src: url("/fonts/Long_Shot.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "squid";
+    src: url("/fonts/Game Of Squids.ttf") format("truetype");
+  }
+
+  @font-face {
+    font-family: "Refrigerator-medium";
+    src: url("/fonts/Refrigerator Deluxe Bold.otf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: "Verve-regular";
     src: url("/fonts/Verve.ttf") format("truetype");
   }
 
   @font-face {
-    font-family: "general";
-    src: url("/fonts/Verve.ttf") format("truetype");
-  }
-
-  @font-face {
-    font-family: "robert-medium";
-    src: url("/fonts/Refrigerator Deluxe Bold.otf") format("truetype");
-  }
-
-  @font-face {
-    font-family: "robert-regular";
-    src: url("/fonts/Verve.ttf") format("truetype");
-  }
-
-  @font-face {
-    font-family: "pubg";
+    font-family: "saintCarell";
     src: url("/fonts/SaintCarell.otf") format("truetype");
   }
   
-  /* @font-face {
-    font-family: "pubg";
-    src: url("/fonts/HeadlinerNo.45 DEMO.ttf") format("truetype");
-  } */
+  @font-face {
+    font-family: "fright";
+    src: url("/fonts/TheFrightHouseDEMO.otf") format("truetype");
+  }
   
 }
 
@@ -99,18 +104,18 @@ body {
   }
 
   .special-font b {
-    font-family: "Pubg";
+    font-family: "saintCarell";
     font-feature-settings: "ss01" on;
     font-weight: 500;
   }
 
   .hero-heading {
     /* Removed duplicate text-5xl utility */
-    @apply uppercase font-pubg font-thin text-5xl sm:right-10 lg:text-7xl;
+    @apply uppercase font-saintCarell font-thin sm:right-10 text-2xl md:text-5xl lg:text-7xl;
   }
 
   .about-subtext {
-    @apply absolute bottom-[-80dvh] left-1/2 w-full max-w-96 -translate-x-1/2 text-center font-circular-web text-lg md:max-w-[34rem];
+    @apply absolute bottom-[-80dvh] left-1/2 w-full max-w-96 -translate-x-1/2 text-center font-fright text-xl md:max-w-[34rem];
   }
 
   .about-video {
@@ -122,7 +127,7 @@ body {
   }
 
   .animated-word {
-    @apply special-font font-pubg font-thin opacity-0;
+    @apply special-font font-saintCarell font-thin opacity-0;
     transform: translate3d(10px, 51px, -60px) rotateY(60deg) rotateX(-40deg);
     transform-origin: 50% 50% -150px !important;
     will-change: opacity, transform;
@@ -137,7 +142,7 @@ body {
   }
 
   .bento-title {
-    @apply uppercase md:text-6xl text-4xl font-thin font-pubg;
+    @apply uppercase md:text-6xl text-4xl font-thin font-saintCarell;
   }
 
   .story-img-container {

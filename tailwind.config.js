@@ -4,13 +4,12 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // "pubg": ["pubg", "sans-serif"],
-        // zentry: ["zentry", "sans-serif"],
-        pubg: ["pubg", "sans-serif"],
-        general: ["general", "sans-serif"],
-        "circular-web": ["circular-web", "sans-serif"],
-        "robert-medium": ["robert-medium", "sans-serif"],
-        "robert-regular": ["robert-regular", "sans-serif"],
+        saintCarell: ["saintCarell", "sans-serif"],
+        squid: ["squid", "sans-serif"],
+        fright: ["fright", "sans-serif"],
+        "long_shot": ["long_shot", "sans-serif"],
+        "Refrigerator-medium": ["Refrigerator-medium", "sans-serif"],
+        "Verve-regular": ["Verve-regular", "sans-serif"],
       },
       colors: {
         blue: {
@@ -19,9 +18,6 @@ export default {
           100: "#F0F2FA",
           200: "#010101",
           300: "#4FB7DD",
-        },
-        violet: {
-          300: "#5724ff",
         },
         yellow: {
           100: "#8e983f",

@@ -1,27 +1,27 @@
 export const MAIN_IMAGES = [
-  "/comboImg/main1.jpg",
-  "/comboImg/main2.jpg",
-  "/comboImg/main3.jpg",
-  "/comboImg/main4.jpg",
+  "/comboImg/main1.webp",
+  "/comboImg/main2.webp",
+  "/comboImg/main3.webp",
+  "/comboImg/main4.webp",
 ];
 
 export const COMBO_IMAGES = [
-  "/comboImg/1.jpg",
-  "/comboImg/2.jpg",
-  "/comboImg/3.jpg",
-  "/comboImg/4.jpg",
-  "/comboImg/5.jpg",
-  "/comboImg/6.jpg",
-  "/comboImg/7.jpg",
-  "/comboImg/8.jpg",
-  "/comboImg/9.jpg",
-  "/comboImg/11.jpg",
+  "/comboImg/1.webp",
+  "/comboImg/2.webp",
+  "/comboImg/3.webp",
+  "/comboImg/4.webp",
+  "/comboImg/5.webp",
+  "/comboImg/6.webp",
+  "/comboImg/7.webp",
+  "/comboImg/8.webp",
+  "/comboImg/9.webp",
+  "/comboImg/11.webp",
 ];
 
 export const COUPON_IMAGES = [
-  "/comboImg/coupon1.png",
-  "/comboImg/coupon2.png",
-  "/comboImg/coupon3.png",
-  "/comboImg/coupon4.png",
-  "/comboImg/coupon5.png",
+  "/comboImg/coupon1.webp",
+  "/comboImg/coupon2.webp",
+  "/comboImg/coupon3.webp",
+  "/comboImg/coupon4.webp",
+  "/comboImg/coupon5.webp",
 ];

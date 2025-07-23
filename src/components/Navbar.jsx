@@ -4,9 +4,11 @@ import { useWindowScroll } from "react-use";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { GiClothesline } from "react-icons/gi";
 import Button from "./Button";
+import Login from "./pages/Login";
+import { useNavigate } from "react-router-dom";
 
 // Move NAV_ITEMS outside of component and do NOT use hooks at top-level
-const NAV_ITEMS = ["Home", "About", "Features", "Inventory", "Contact"];
+const NAV_ITEMS = ["Home", "About", "Product", "Contact", "Login"];
 
 // Extract showDesktopNav logic to a custom hook to avoid using hooks inside render
 function useShowDesktopNav() {
@@ -44,6 +46,9 @@ const NavBar = () => {
   // Scroll
   const { y: currentScrollY } = useWindowScroll();
 
+  // React Router navigation
+  const navigate = useNavigate();
+
   // Handlers (memoized)
   const toggleAudioIndicator = useCallback(() => {
     setIsAudioPlaying((prev) => !prev);
@@ -53,6 +58,15 @@ const NavBar = () => {
   const toggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen((prev) => !prev);
   }, []);
+
+  // Handle Login navigation
+  const handleLoginClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      navigate("/login");
+    },
+    [navigate]
+  );
 
   // Initial animation on mount
   useEffect(() => {
@@ -66,7 +80,7 @@ const NavBar = () => {
       opacity: 1,
       duration: 0.8,
       ease: "power2.out"
-    }, 4)
+    }, 0.5)
       .to(navItemsRef.current.filter(Boolean), {
         x: 0,
         opacity: 1,
@@ -156,8 +170,7 @@ const NavBar = () => {
               src="/img/logo.avif"
               alt="Logo"
               className="w-[100px] h-auto filter invert"
-              loading="lazy"
-              decoding="async"
+              /* Removed loading="lazy" and decoding="async" as per instructions */
               style={{ filter: "invert(1) brightness(1.2)" }}
             />
           </div>
@@ -166,21 +179,41 @@ const NavBar = () => {
             {/* Responsive Desktop Navigation Links */}
             {showDesktopNav && (
               <div className="flex items-center gap-2.5 lg:gap-3">
-                {navLinks.map((item, index) => (
-                  <a
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
-                    ref={el => (navItemsRef.current[index] = el)}
-                    style={{ display: "inline-block" }}
-                    tabIndex={0}
-                  >
-                    <Button
-                      bullet={<GiClothesline />}
-                      title={item}
-                      containerClass="bg-blue-50 px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2"
-                    />
-                  </a>
-                ))}
+                {navLinks.map((item, index) => {
+                  if (item === "Login") {
+                    return (
+                      <a
+                        key={item}
+                        href="/login"
+                        ref={el => (navItemsRef.current[index] = el)}
+                        style={{ display: "inline-block" }}
+                        tabIndex={0}
+                        onClick={handleLoginClick}
+                      >
+                        <Button
+                          bullet={<GiClothesline />}
+                          title={item}
+                          containerClass="bg-blue-50 px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2"
+                        />
+                      </a>
+                    );
+                  }
+                  return (
+                    <a
+                      key={item}
+                      href={`#${item.toLowerCase()}`}
+                      ref={el => (navItemsRef.current[index] = el)}
+                      style={{ display: "inline-block" }}
+                      tabIndex={0}
+                    >
+                      <Button
+                        bullet={<GiClothesline />}
+                        title={item}
+                        containerClass="bg-blue-50 px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2"
+                      />
+                    </a>
+                  );
+                })}
               </div>
             )}
             {/* Right side - Audio button and Mobile menu button */}
@@ -253,23 +286,48 @@ const NavBar = () => {
           )}
         >
           <div className="p-3 space-y-2.5">
-            {navLinks.map((item, idx) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full"
-                ref={el => (navItemsRef.current[idx + navLinks.length] = el)}
-                tabIndex={0}
-                style={{ display: "block" }}
-              >
-                <Button
-                  bullet={<GiClothesline />}
-                  title={item}
-                  containerClass="bg-blue-50 w-full px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2 justify-center"
-                />
-              </a>
-            ))}
+            {navLinks.map((item, idx) => {
+              if (item === "Login") {
+                return (
+                  <a
+                    key={item}
+                    href="/login"
+                    onClick={e => {
+                      e.preventDefault();
+                      setIsMobileMenuOpen(false);
+                      navigate("/login");
+                    }}
+                    className="block w-full"
+                    ref={el => (navItemsRef.current[idx + navLinks.length] = el)}
+                    tabIndex={0}
+                    style={{ display: "block" }}
+                  >
+                    <Button
+                      bullet={<GiClothesline />}
+                      title={item}
+                      containerClass="bg-blue-50 w-full px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2 justify-center"
+                    />
+                  </a>
+                );
+              }
+              return (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full"
+                  ref={el => (navItemsRef.current[idx + navLinks.length] = el)}
+                  tabIndex={0}
+                  style={{ display: "block" }}
+                >
+                  <Button
+                    bullet={<GiClothesline />}
+                    title={item}
+                    containerClass="bg-blue-50 w-full px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2 justify-center"
+                  />
+                </a>
+              );
+            })}
           </div>
         </div>
       </header>
