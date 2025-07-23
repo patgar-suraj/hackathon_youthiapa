@@ -1,15 +1,29 @@
-import { Suspense, lazy, useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/pages/Login";
+import Login from "./components/Login";
 import Loading from "./components/Loading";
+import ScrollToTop from "./components/pages/customs/ScrollToTop";
+import Exclusive from "./components/home/Exclusive";
+import Home from "./components/home/Home";
+import NavBar from "./components/Navbar";
+import Contact from "./components/home/Contact";
+import Offer from "./components/home/Offer";
+import HoodieSec from "./components/home/HoodieSec";
+import CustomCursor from "./components/pages/customs/CustomCursor";
 
-const About = lazy(() => import("./components/pages/About"));
-const Home = lazy(() => import("./components/pages/Home"));
-const NavBar = lazy(() => import("./components/Navbar"));
-const Contact = lazy(() => import("./components/pages/Contact"));
-const Offer = lazy(() => import("./components/pages/Offer"));
-const HoodieSec = lazy(() => import("./components/pages/HoodieSec"));
-const CustomCursor = lazy(() => import("./components/CustomCursor"));
+// Only lazy load heavy or rarely used pages
+const Products = lazy(() => import("./components/pages/product/Products"));
+const ProductDetails = lazy(() => import("./components/pages/product/ProductDetails"));
+
+const HomeWithSections = () => (
+  <>
+    <Home />
+    <Exclusive />
+    <Offer />
+    <HoodieSec />
+    <Contact />
+  </>
+);
 
 function App() {
   const [showLoading, setShowLoading] = useState(true);
@@ -17,37 +31,32 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoading(false);
-    }, 3000); // 3 seconds
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <Router>
-      <Suspense fallback={null}>
-        <CustomCursor />
-        {showLoading ? (
+      <CustomCursor />
+      {showLoading ? (
+        // Wrap Loading in a div with className instead of class
+        <div className="loading-wrapper">
           <Loading />
-        ) : (
-          <>
-            <NavBar />
+        </div>
+      ) : (
+        <>
+          <ScrollToTop />
+          <NavBar />
+          <Suspense fallback={null}>
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <>
-                    <Home />
-                    <About />
-                    <Offer />
-                    <HoodieSec />
-                    <Contact />
-                  </>
-                }
-              />
+              <Route path="/" element={<HomeWithSections />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/productDetails/:id" element={<ProductDetails />} />
             </Routes>
-          </>
-        )}
-      </Suspense>
+          </Suspense>
+        </>
+      )}
     </Router>
   );
 }

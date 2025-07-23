@@ -3,11 +3,11 @@ import gsap from "gsap";
 import { useWindowScroll } from "react-use";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { GiClothesline } from "react-icons/gi";
-import Button from "./Button";
+import Button from "./pages/customs/Button"; // <-- FIXED RELATIVE IMPORT
 import { useNavigate } from "react-router-dom";
 
 // Move NAV_ITEMS outside of component and do NOT use hooks at top-level
-const NAV_ITEMS = ["Home", "About", "Product", "Contact", "Login"];
+const NAV_ITEMS = ["Home", "Products", "Contact", "Login"];
 
 // Extract showDesktopNav logic to a custom hook to avoid using hooks inside render
 function useShowDesktopNav() {
@@ -63,6 +63,24 @@ const NavBar = () => {
     (e) => {
       e.preventDefault();
       navigate("/login");
+    },
+    [navigate]
+  );
+
+  // Handle Products navigation
+  const handleProductsClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      navigate("/products");
+    },
+    [navigate]
+  );
+
+  // Handle Home navigation
+  const handleHomeClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      navigate("/");
     },
     [navigate]
   );
@@ -186,6 +204,46 @@ const NavBar = () => {
                       </a>
                     );
                   }
+                  if (item === "Products") {
+                    return (
+                      <a
+                        key={item}
+                        href="/products"
+                        ref={el => (navItemsRef.current[index] = el)}
+                        className="inline-block"
+                        tabIndex={0}
+                        onClick={handleProductsClick}
+                      >
+                        <Button
+                          bullet={<GiClothesline />}
+                          title={item}
+                          containerClass="bg-blue-50 px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2"
+                        />
+                      </a>
+                    );
+                  }
+                  if (item === "Home") {
+                    return (
+                      <a
+                        key={item}
+                        href="/"
+                        ref={el => (navItemsRef.current[index] = el)}
+                        className="inline-block"
+                        tabIndex={0}
+                        onClick={e => {
+                          e.preventDefault();
+                          navigate("/");
+                        }}
+                      >
+                        <Button
+                          bullet={<GiClothesline />}
+                          title={item}
+                          containerClass="bg-blue-50 px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2"
+                        />
+                      </a>
+                    );
+                  }
+                  // About navigation removed
                   return (
                     <a
                       key={item}
@@ -299,6 +357,51 @@ const NavBar = () => {
                   </a>
                 );
               }
+              if (item === "Products") {
+                return (
+                  <a
+                    key={item}
+                    href="/products"
+                    onClick={e => {
+                      e.preventDefault();
+                      setIsMobileMenuOpen(false);
+                      navigate("/products");
+                    }}
+                    className="block w-full"
+                    ref={el => (navItemsRef.current[idx + navLinks.length] = el)}
+                    tabIndex={0}
+                  >
+                    <Button
+                      bullet={<GiClothesline />}
+                      title={item}
+                      containerClass="bg-blue-50 w-full px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2 justify-center"
+                    />
+                  </a>
+                );
+              }
+              if (item === "Home") {
+                return (
+                  <a
+                    key={item}
+                    href="/"
+                    onClick={e => {
+                      e.preventDefault();
+                      setIsMobileMenuOpen(false);
+                      navigate("/");
+                    }}
+                    className="block w-full"
+                    ref={el => (navItemsRef.current[idx + navLinks.length] = el)}
+                    tabIndex={0}
+                  >
+                    <Button
+                      bullet={<GiClothesline />}
+                      title={item}
+                      containerClass="bg-blue-50 w-full px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2 justify-center"
+                    />
+                  </a>
+                );
+              }
+              // About navigation removed
               return (
                 <a
                   key={item}

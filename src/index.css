@@ -32,8 +32,8 @@ body {
 */
 @layer base {
   @font-face {
-    font-family: "long_shot";
-    src: url("/fonts/Long_Shot.ttf") format("truetype");
+    font-family: "LEMONMILK";
+    src: url("/fonts/LEMONMILK-Regular.otf") format("truetype");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -105,11 +105,11 @@ body {
     @apply uppercase font-saintCarell font-thin sm:right-10 text-2xl md:text-5xl lg:text-7xl;
   }
 
-  .about-subtext {
+  .exclusive-subtext {
     @apply absolute bottom-[-80dvh] left-1/2 w-full max-w-96 -translate-x-1/2 text-center font-fright text-xl md:max-w-[34rem];
   }
 
-  .about-video {
+  .exclusive-video {
     @apply absolute left-1/2 top-0 z-20 h-[60vh] w-96 origin-center -translate-x-1/2 overflow-hidden rounded-3xl md:w-[30vw];
   }
 
@@ -304,3 +304,5 @@ body {
     opacity: 0.8;
   }
 }
+
+

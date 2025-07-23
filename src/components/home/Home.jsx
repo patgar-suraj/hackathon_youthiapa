@@ -4,8 +4,8 @@ import { ScrollTrigger } from "gsap/all";
 import { GiLoincloth } from "react-icons/gi";
 import { useRef, useState } from "react";
 
-import Button from "../Button";
-import VideoPreview from "../VideoPreview";
+import Button from "../pages/customs/Button";
+import VideoPreview from "../pages/customs/VideoPreview";
 
 gsap.registerPlugin(ScrollTrigger);
 

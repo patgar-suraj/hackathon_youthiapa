@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/all";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const About = () => {
+const Exclusive = () => {
   const lookRef = useRef(null);
   const exclusiveRef = useRef(null);
   const maskClipRef = useRef(null);
@@ -119,8 +119,8 @@ const About = () => {
   }, []);
 
   return (
-    <section id="about" className="relative min-h-screen w-screen">
-      <img src="/aboutimg/aboutbg.webp" alt="" className="absolute top-0 left-0 w-full h-full object-cover" />
+    <section id="exclusive" className="relative min-h-screen w-screen">
+      <img src="/exclusiveimg/exclusivebg.webp" alt="" className="absolute top-0 left-0 w-full h-full object-cover" />
       <div className="relative mb-8 mt-36 flex flex-col items-center gap-5">
         <p className="welcomeTage font-fright text-sm text-[#B5894A] uppercase md:text-[20px] mt-14 tracking-widest">
           A new chapter
@@ -146,7 +146,7 @@ const About = () => {
           </p>
         </h2>
 
-        <div className="about-subtext">
+        <div className="exclusive-subtext">
           <p className="text-[#2C2C2C]">
             We’re built on respect, responsibility, and resilience.
           </p>
@@ -159,7 +159,7 @@ const About = () => {
       <div className="h-dvh w-screen overflow-x-hidden" id="clip">
         <div
           ref={maskClipRef}
-          className="mask-clip-path about-video"
+          className="mask-clip-path exclusive-video"
           style={{
             // fallback for mobile: initial state for animation
             width: "100vw",
@@ -170,7 +170,7 @@ const About = () => {
           }}
         >
           <img
-            src="/aboutimg/bb.webp"
+            src="/exclusiveimg/bb.webp"
             className="absolute left-0 top-0 size-full object-cover"
             alt=""
           />
@@ -180,4 +180,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default Exclusive;

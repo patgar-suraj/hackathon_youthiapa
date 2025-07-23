@@ -1,7 +1,7 @@
 import { BiSolidDiscount } from "react-icons/bi";
 import { TbArrowLoopLeft, TbArrowIteration } from "react-icons/tb";
 import gsap from "gsap";
-import { MAIN_IMAGES, COMBO_IMAGES, COUPON_IMAGES } from "../OfferData";
+import { MAIN_IMAGES, COMBO_IMAGES, COUPON_IMAGES } from "../data/OfferData";
 import { useRef, useState, useEffect, useCallback, memo } from "react";
 
 // Memoized ComboImage for performance

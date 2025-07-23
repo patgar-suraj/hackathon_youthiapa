@@ -1,0 +1,72 @@
+/* back button */
+#back-btn {
+    padding: 0.9em 1.8em;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 4px;
+    color: transparent;
+    border: 3px solid #ff0;
+    font-size: 14px;
+    position: relative;
+    font-family: inherit;
+    background: transparent;
+    cursor: none;
+    top: -30px;
+  }
+  
+  @media (min-width: 768px) and (max-width: 1279px) {
+    #back-btn {
+      left: 60px;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    #back-btn {
+      top: 24px;
+      left: 180px;
+    }
+  }
+  
+  #back-btn::before {
+    content: "button";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #363636;
+    color: #ff0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s;
+  }
+  
+  #back-btn:hover::before {
+    left: 100%;
+    transform: scale(0) rotateY(360deg);
+    opacity: 0;
+  }
+  
+  #back-btn::after {
+    content: "button";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: #363636;
+    color: #ff0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s;
+    transform: scale(0) rotateY(0deg);
+    opacity: 0;
+  }
+  
+  #back-btn:hover::after {
+    left: 0;
+    transform: scale(1) rotateY(360deg);
+    opacity: 1;
+  }

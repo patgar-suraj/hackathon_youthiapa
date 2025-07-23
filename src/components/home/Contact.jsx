@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Button from "../Button";
+import Button from "../pages/customs/Button";
 import { FaInstagram, FaFacebookF, FaXTwitter, FaYoutube, FaEnvelope } from "react-icons/fa6";
 
 gsap.registerPlugin(ScrollTrigger);
