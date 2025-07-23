@@ -1,8 +1,14 @@
-import React, { useEffect, useRef, useCallback, useState } from "react";
+import React, { useRef, useCallback, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Button from "../pages/customs/Button";
-import { FaInstagram, FaFacebookF, FaXTwitter, FaYoutube, FaEnvelope } from "react-icons/fa6";
+import {
+  FaInstagram,
+  FaFacebookF,
+  FaXTwitter,
+  FaYoutube,
+  FaEnvelope,
+} from "react-icons/fa6";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,17 +16,20 @@ const IMAGE_DATA = [
   {
     src: "/contactImg/contact1.webp",
     clipClass: "contact-clip-path-1",
-    containerClass: "absolute -left-20 opacity-0 md:opacity-100 top-0 h-full w-72 overflow-hidden lg:left-20 lg:w-96",
+    containerClass:
+      "absolute -left-20 opacity-0 md:opacity-100 top-0 h-full w-72 overflow-hidden lg:left-20 lg:w-96",
   },
   {
     src: "/contactImg/contact2.webp",
-    clipClass: "contact-clip-path-2 lg:translate-y-40 translate-y-60 overflow-hidden",
+    clipClass:
+      "contact-clip-path-2 lg:translate-y-40 translate-y-60 overflow-hidden",
     containerClass: null,
   },
   {
     src: "/contactImg/bb2.webp",
     clipClass: "victor-clip-path md:scale-125",
-    containerClass: "absolute -top-40 left-20 w-60 sm:top-1/2 md:left-auto md:right-10 lg:top-20 lg:w-80",
+    containerClass:
+      "absolute -top-40 left-20 w-60 sm:top-1/2 md:left-auto md:right-10 lg:top-20 lg:w-80",
   },
 ];
 
@@ -88,67 +97,18 @@ const Contact = () => {
   const containerRef = useRef(null);
   const imageRefs = useRef([null, null, null]);
   const socialRefs = useRef([null, null, null, null]);
-  const lastScrollY = useRef(typeof window !== "undefined" ? window.scrollY : 0);
+  const lastScrollY = useRef(
+    typeof window !== "undefined" ? window.scrollY : 0
+  );
   const [socialsIn, setSocialsIn] = useState(false);
 
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState(null);
 
-  // --- Animated Heading ---
-  const headingRef = useRef(null);
+  // --- Remove Animated Heading ---
+  // const headingRef = useRef(null);
 
-  useEffect(() => {
-    if (!headingRef.current) return;
-
-    // Set initial state: hidden and above
-    gsap.set(headingRef.current, {
-      y: -300,
-      opacity: 0,
-    });
-
-    // Create ScrollTrigger animation
-    const anim = gsap.to(headingRef.current, {
-      y: 0,
-      opacity: 1,
-      duration: 1.1,
-      ease: "bounce.out",
-      paused: true,
-    });
-
-    const trigger = ScrollTrigger.create({
-      trigger: headingRef.current,
-      start: "center center", // when heading is in center of viewport
-      end: "+=800px top", // when heading leaves top of viewport
-      onEnter: () => {
-        anim.play();
-      },
-      onEnterBack: () => {
-        anim.play();
-      },
-      onLeave: () => {
-        // Reverse: move up and fade out
-        gsap.to(headingRef.current, {
-          y: 500,
-          opacity: 0,
-          duration: 0.6,
-          ease: "power2.in",
-        });
-        anim.pause(0);
-      },
-      onLeaveBack: () => {
-        // If scrolling up and heading leaves bottom, reset
-        gsap.set(headingRef.current, { y: 500, opacity: 0 });
-        anim.pause(0);
-      },
-      // markers: true, // Uncomment for debugging
-      toggleActions: "play none none play",
-    });
-
-    return () => {
-      anim.kill();
-      trigger.kill();
-    };
-  }, []);
+  // Remove heading animation effect
 
   const handleMouseMove = useCallback((e) => {
     const container = containerRef.current;
@@ -184,11 +144,13 @@ const Contact = () => {
     }
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     container.addEventListener("mousemove", handleMouseMove, { passive: true });
-    container.addEventListener("mouseleave", handleMouseLeave, { passive: true });
+    container.addEventListener("mouseleave", handleMouseLeave, {
+      passive: true,
+    });
     return () => {
       container.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("mouseleave", handleMouseLeave);
@@ -196,7 +158,7 @@ const Contact = () => {
   }, [handleMouseMove, handleMouseLeave]);
 
   // Socials animation: from right, one by one, on scroll to bottom, reverse on scroll up
-  useEffect(() => {
+  React.useEffect(() => {
     // Set initial state: all off to right, opacity 0, but with smooth transition
     SOCIALS.forEach((_, i) => {
       const ref = socialRefs.current[i];
@@ -279,7 +241,8 @@ const Contact = () => {
       if (!containerRef.current) return;
       const container = containerRef.current;
       const rect = container.getBoundingClientRect();
-      const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+      const windowHeight =
+        window.innerHeight || document.documentElement.clientHeight;
       const scrollY = window.scrollY;
 
       // Determine scroll direction
@@ -343,9 +306,20 @@ const Contact = () => {
   };
 
   return (
-    <div id="contact" className="relative h-auto w-screen px-10 pt-20 md:pt-0 overflow-x-hidden">
-      <img src="/contactImg/contact_bg.webp" alt="appBg" className="absolute top-0 left-0 w-full h-full object-cover z-[-15]" />
-      <img src="/comboImg/offerbg.webp" alt="offerBg" className="absolute top-0 left-0 w-full h-full object-cover opacity-[0.02] z-[-10]" />
+    <div
+      id="contact"
+      className="relative h-auto w-screen px-10 pt-20 md:pt-0 overflow-x-hidden"
+    >
+      <img
+        src="/contactImg/contact_bg.webp"
+        alt="appBg"
+        className="absolute top-0 left-0 w-full h-full object-cover z-[-15]"
+      />
+      <img
+        src="/comboImg/offerbg.webp"
+        alt="offerBg"
+        className="absolute top-0 left-0 w-full h-full object-cover opacity-[0.02] z-[-10]"
+      />
       <div
         ref={containerRef}
         className="relative rounded-lg py-24 text-blue-50 sm:overflow-hidden"
@@ -353,12 +327,12 @@ const Contact = () => {
         {/* Left images */}
         <div className={IMAGE_DATA[0].containerClass}>
           <ImageClipBox
-            ref={el => (imageRefs.current[0] = el)}
+            ref={(el) => (imageRefs.current[0] = el)}
             src={IMAGE_DATA[0].src}
             clipClass={IMAGE_DATA[0].clipClass}
           />
           <ImageClipBox
-            ref={el => (imageRefs.current[1] = el)}
+            ref={(el) => (imageRefs.current[1] = el)}
             src={IMAGE_DATA[1].src}
             clipClass={IMAGE_DATA[1].clipClass}
           />
@@ -366,7 +340,7 @@ const Contact = () => {
         {/* Right/top image */}
         <div className={IMAGE_DATA[2].containerClass}>
           <ImageClipBox
-            ref={el => (imageRefs.current[2] = el)}
+            ref={(el) => (imageRefs.current[2] = el)}
             src={IMAGE_DATA[2].src}
             clipClass={IMAGE_DATA[2].clipClass}
           />
@@ -377,42 +351,89 @@ const Contact = () => {
             Let’s connect
           </p>
           <h1
-            ref={headingRef}
+            // ref={headingRef}
             className="text-3xl md:text-7xl font-bold font-saintCarell z-10"
-            style={{ willChange: "transform, opacity" }}
+            // style={{ willChange: "transform, opacity" }}
           >
             Reach out to us <br /> we’re here to help <br /> you look your best
           </h1>
-          <Button title="contact us" containerClass="mt-10 cursor-pointer hover:bg-[#E49906] text-xs sm:text-sm md:text-base lg:text-lg" />
+
+          <button className="cursor-pointer relative bg-white/10 py-2 rounded-full min-w-[8.5rem] min-h-[2.92rem] group max-w-full flex items-center justify-start hover:bg-yellow-400 transition-all duration-[0.8s] ease-[cubic-bezier(0.510,0.026,0.368,1.016)] shadow-[inset_1px_2px_5px_#00000080]">
+            <div className="absolute flex px-1 py-0.5 justify-start items-center inset-0">
+              <div className="w-[0%] group-hover:w-full transition-all duration-[1s] ease-[cubic-bezier(0.510,0.026,0.368,1.016)]"></div>
+              <div className="rounded-full shrink-0 flex justify-center items-center shadow-[inset_1px_-1px_3px_0_black] h-full aspect-square bg-yellow-400 transition-all duration-[1s] ease-[cubic-bezier(0.510,0.026,0.368,1.016)] group-hover:bg-black">
+                <div className="size-[0.8rem] text-black group-hover:text-white group-hover:-rotate-45 transition-all duration-[1s] ease-[cubic-bezier(0.510,0.026,0.368,1.016)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 16 16"
+                    height="100%"
+                    width="100%"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M12.175 9H0V7H12.175L6.575 1.4L8 0L16 8L8 16L6.575 14.6L12.175 9Z"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div className="pl-[3.4rem] pr-[1.1rem] group-hover:pl-[1.1rem] font-squid group-hover:pr-[3.4rem] transition-all duration-[1s] ease-[cubic-bezier(0.510,0.026,0.368,1.016)] group-hover:text-black text-white">
+              CONTACT US
+            </div>
+          </button>
         </div>
         {/* Email section before social media buttons */}
         <form
           onSubmit={handleEmailSubmit}
-          className="absolute left-1/2 -translate-x-1/2 bottom-28 flex flex-col items-center z-20 w-full max-w-xs sm:max-w-sm md:max-w-md"
+          className="
+            absolute left-1/2 -translate-x-1/2 bottom-28
+            flex flex-col items-center z-20
+            w-[90vw] max-w-xs sm:max-w-sm md:max-w-md
+            px-2 sm:px-0
+          "
           autoComplete="off"
         >
-          <div className="flex w-full bg-white/80 rounded-full shadow-lg overflow-hidden mb-10">
-            <span className="flex items-center px-3 text-[#121212]">
+          <div className="
+            flex w-full bg-white/80 rounded-full shadow-lg overflow-hidden mb-10
+            flex-row
+            "
+          >
+            <span className="flex items-center px-2 sm:px-3 text-[#121212]">
               <FaEnvelope size={18} />
             </span>
             <input
               type="email"
-              className="flex-1 px-3 py-3 bg-transparent outline-none text-[#121212] text-sm sm:text-base"
+              className="
+                flex-1 px-2 sm:px-3 py-2 sm:py-3 bg-transparent outline-none
+                text-[#121212] font-LEMONMILK
+                text-xs xs:text-sm sm:text-base
+                min-w-0
+              "
               placeholder="Enter your email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
               aria-label="Email address"
             />
             <button
               type="submit"
-              className="bg-[#E49906] hover:bg-[#c17d04] text-white px-5 py-2 text-sm sm:text-base font-medium transition-colors duration-200"
+              className="
+                bg-[#E49906] hover:bg-[#c17d04] text-white
+                px-3 sm:px-5 py-2
+                text-xs xs:text-sm sm:text-base
+                font-medium font-LEMONMILK
+                transition-colors duration-200
+                whitespace-nowrap
+              "
             >
               Send
             </button>
           </div>
           {emailStatus && (
-            <span className="mt-2 text-xs sm:text-sm text-[#121212] bg-white/80 rounded px-2 py-1">{emailStatus}</span>
+            <span className="mt-2 text-xs sm:text-sm text-[#121212] bg-white/80 rounded px-2 py-1">
+              {emailStatus}
+            </span>
           )}
         </form>
         {/* Social icons at bottom center */}
@@ -423,7 +444,7 @@ const Contact = () => {
               href={href}
               label={label}
               icon={icon}
-              ref={el => (socialRefs.current[idx] = el)}
+              ref={(el) => (socialRefs.current[idx] = el)}
             />
           ))}
         </div>

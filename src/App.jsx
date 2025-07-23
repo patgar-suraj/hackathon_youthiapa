@@ -10,6 +10,7 @@ import Contact from "./components/home/Contact";
 import Offer from "./components/home/Offer";
 import HoodieSec from "./components/home/HoodieSec";
 import CustomCursor from "./components/pages/customs/CustomCursor";
+import About from "./components/About";
 
 // Only lazy load heavy or rarely used pages
 const Products = lazy(() => import("./components/pages/product/Products"));
@@ -50,9 +51,10 @@ function App() {
           <Suspense fallback={null}>
             <Routes>
               <Route path="/" element={<HomeWithSections />} />
-              <Route path="/login" element={<Login />} />
+              <Route path="/about" element={<About />} />
               <Route path="/products" element={<Products />} />
               <Route path="/productDetails/:id" element={<ProductDetails />} />
+              <Route path="/login" element={<Login />} />
             </Routes>
           </Suspense>
         </>

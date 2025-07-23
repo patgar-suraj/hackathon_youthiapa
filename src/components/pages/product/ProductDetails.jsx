@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PRODUCTS } from "../../data/ProductsData";
-import "../../pages/customs/prodetailBKbtn.css";
+import "../customs/prodetailBKbtn.css";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -201,7 +201,7 @@ const ProductDetails = () => {
           <img
             src="/productsImg/s_5.webp"
             alt=""
-            className="md:w-1/2 lg:w-1/4 ml-36"
+            className="md:w-1/2 lg:w-1/4 lg:ml-36"
           />
         </div>
     </section>

@@ -2,10 +2,10 @@ import "./pages/customs/loading.css";
 
 const Loading = () => {
   return (
-      <div class="loader">
-        <div class="track"></div>
-        <div class="inner-track"></div>
-        <div class="orb"></div>
+      <div className="loader">
+        <div className="track"></div>
+        <div className="inner-track"></div>
+        <div className="orb"></div>
       </div>
   );
 };

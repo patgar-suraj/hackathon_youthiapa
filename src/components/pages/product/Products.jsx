@@ -249,7 +249,7 @@ const Products = React.memo(function Products() {
   return (
     <section
       id="products"
-      className="relative w-full min-h-screen mt-20 py-16 px-4 md:px-16"
+      className="relative w-full min-h-screen mt-20 py-16 px-4 md:px-16 overflow-x-hidden"
       style={{ cursor: "none" }}
     >
       <div className="max-w-7xl mx-auto">

@@ -7,7 +7,7 @@ import Button from "./pages/customs/Button"; // <-- FIXED RELATIVE IMPORT
 import { useNavigate } from "react-router-dom";
 
 // Move NAV_ITEMS outside of component and do NOT use hooks at top-level
-const NAV_ITEMS = ["Home", "Products", "Contact", "Login"];
+const NAV_ITEMS = ["Home", "Products", "About", "Login"];
 
 // Extract showDesktopNav logic to a custom hook to avoid using hooks inside render
 function useShowDesktopNav() {
@@ -81,6 +81,15 @@ const NavBar = () => {
     (e) => {
       e.preventDefault();
       navigate("/");
+    },
+    [navigate]
+  );
+
+  // Handle About navigation
+  const handleAboutClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      navigate("/about");
     },
     [navigate]
   );
@@ -243,7 +252,25 @@ const NavBar = () => {
                       </a>
                     );
                   }
-                  // About navigation removed
+                  if (item === "About") {
+                    return (
+                      <a
+                        key={item}
+                        href="/about"
+                        ref={el => (navItemsRef.current[index] = el)}
+                        className="inline-block"
+                        tabIndex={0}
+                        onClick={handleAboutClick}
+                      >
+                        <Button
+                          bullet={<GiClothesline />}
+                          title={item}
+                          containerClass="bg-blue-50 px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2"
+                        />
+                      </a>
+                    );
+                  }
+                  // fallback (should not happen)
                   return (
                     <a
                       key={item}
@@ -401,7 +428,29 @@ const NavBar = () => {
                   </a>
                 );
               }
-              // About navigation removed
+              if (item === "About") {
+                return (
+                  <a
+                    key={item}
+                    href="/about"
+                    onClick={e => {
+                      e.preventDefault();
+                      setIsMobileMenuOpen(false);
+                      navigate("/about");
+                    }}
+                    className="block w-full"
+                    ref={el => (navItemsRef.current[idx + navLinks.length] = el)}
+                    tabIndex={0}
+                  >
+                    <Button
+                      bullet={<GiClothesline />}
+                      title={item}
+                      containerClass="bg-blue-50 w-full px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition-all duration-200 flex items-center gap-2 justify-center"
+                    />
+                  </a>
+                );
+              }
+              // fallback (should not happen)
               return (
                 <a
                   key={item}
