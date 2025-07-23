@@ -4,7 +4,7 @@ import Login from "./components/pages/Login";
 import Loading from "./components/Loading";
 
 const About = lazy(() => import("./components/pages/About"));
-const Hero = lazy(() => import("./components/pages/Hero"));
+const Home = lazy(() => import("./components/pages/Home"));
 const NavBar = lazy(() => import("./components/Navbar"));
 const Contact = lazy(() => import("./components/pages/Contact"));
 const Offer = lazy(() => import("./components/pages/Offer"));
@@ -35,7 +35,7 @@ function App() {
                 path="/"
                 element={
                   <>
-                    <Hero />
+                    <Home />
                     <About />
                     <Offer />
                     <HoodieSec />
@@ -44,7 +44,6 @@ function App() {
                 }
               />
               <Route path="/login" element={<Login />} />
-              {/* Add more routes as needed */}
             </Routes>
           </>
         )}

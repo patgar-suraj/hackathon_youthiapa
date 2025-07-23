@@ -14,7 +14,7 @@ const IMAGE_DATA = [
   },
   {
     src: "/contactImg/contact2.webp",
-    clipClass: "contact-clip-path-2 lg:translate-y-40 translate-y-60",
+    clipClass: "contact-clip-path-2 lg:translate-y-40 translate-y-60 overflow-hidden",
     containerClass: null,
   },
   {
@@ -343,7 +343,7 @@ const Contact = () => {
   };
 
   return (
-    <div id="contact" className="relative h-auto w-screen px-10 pt-20 md:pt-0">
+    <div id="contact" className="relative h-auto w-screen px-10 pt-20 md:pt-0 overflow-x-hidden">
       <img src="/contactImg/contact_bg.webp" alt="appBg" className="absolute top-0 left-0 w-full h-full object-cover z-[-15]" />
       <img src="/comboImg/offerbg.webp" alt="offerBg" className="absolute top-0 left-0 w-full h-full object-cover opacity-[0.02] z-[-10]" />
       <div

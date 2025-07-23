@@ -9,7 +9,7 @@ import VideoPreview from "../VideoPreview";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Hero = () => {
+const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(1);
   const [hasClicked, setHasClicked] = useState(false);
 
@@ -83,7 +83,7 @@ const Hero = () => {
         height: "100%",
         duration: 1,
         ease: "power1.inOut",
-        onStart: () => nextVdRef.current.play(),
+        onStart: () => nextVdRef.current && nextVdRef.current.play(),
       });
       gsap.from("#current-video", {
         transformOrigin: "center center",
@@ -145,12 +145,14 @@ const Hero = () => {
     }
   }, []);
 
-  // Fix: Use import.meta.env.BASE_URL to ensure correct path for Vite static assets
+  // --- FIX: Use Vite's /public folder for video assets ---
+  // In Vite, static assets in the public folder are served from the root ("/").
+  // So, reference videos as "/videos/hero-1.mp4" (with a leading slash).
+  // Do NOT use import.meta.env.BASE_URL for public assets, just use "/videos/hero-1.mp4".
+  // This avoids ERR_CACHE_OPERATION_NOT_SUPPORTED and works in dev/prod.
+
   const getVideoSrc = (index) => {
-    // Ensure leading slash for BASE_URL if not present
-    let base = import.meta.env.BASE_URL || "/";
-    if (!base.endsWith("/")) base += "/";
-    return `${base}videos/hero-${index}.mp4`;
+    return `/videos/hero-${index}.mp4`;
   };
 
   return (
@@ -199,7 +201,7 @@ const Hero = () => {
           />
         </div>
 
-        <h1 className="special-font hero-heading absolute bottom-10 right-10 lg:mr-14 z-40 text-blue-75">
+        <h1 className="special-font hero-heading absolute bottom-10 right-10 z-40 text-blue-75">
           <p ref={clothingTextRef}>CLOTHIN<b>G</b></p>
         </h1>
 
@@ -230,11 +232,11 @@ const Hero = () => {
         </div>
       </div>
 
-      <h1 className="special-font hero-heading absolute bottom-10 right-10 lg:mr-14 text-black">
+      <h1 className="special-font hero-heading absolute bottom-10 right-10 text-black">
         CLOTHIN<b>G</b>
       </h1>
     </div>
   );
 };
 
-export default Hero;
+export default Home;

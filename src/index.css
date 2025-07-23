@@ -1,13 +1,4 @@
-@import url("https://fonts.cdnfonts.com/css/general-sans");
 
-/* 
-  The following @tailwind directives are for Tailwind CSS processing.
-  If you are seeing "Unknown at rule @tailwind" errors in your editor,
-  it is because your editor's CSS linter does not recognize Tailwind's custom at-rules.
-  These are not errors in Tailwind projects and should be left as-is for Tailwind to work.
-  If you want to suppress these errors, configure your editor to ignore unknown at-rules,
-  or use a Tailwind-aware extension.
-*/
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,7 +14,7 @@ body {
   width: 100dvw;
   overflow-x: hidden;
   background-color: #dfdff0;
-  font-family: "General Sans", sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   cursor: url("/public/img/logo.png"), auto;
 }
 

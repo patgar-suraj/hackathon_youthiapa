@@ -4,7 +4,6 @@ import { useWindowScroll } from "react-use";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { GiClothesline } from "react-icons/gi";
 import Button from "./Button";
-import Login from "./pages/Login";
 import { useNavigate } from "react-router-dom";
 
 // Move NAV_ITEMS outside of component and do NOT use hooks at top-level
@@ -144,24 +143,15 @@ const NavBar = () => {
     <div
       ref={navContainerRef}
       className={clsx(
-        "fixed left-0 right-0 top-4 z-50 transition-all duration-700 mx-5 md:mx-36 lg:mx-10",
+        // Glass effect, border, shadow, rounded, fixed, responsive margin
+        "fixed left-0 right-0 top-4 z-50 transition-all duration-700 mx-2 md:mx-36 lg:mx-10",
+        // Tailwind glass effect
+        "bg-[rgba(20,24,40,0.55)] backdrop-blur-[18px] rounded-[18px] border border-white/15 shadow-[0_4px_32px_0_rgba(0,0,0,0.12)]"
       )}
-      style={{
-        // Glass effect: semi-transparent, blur, border, subtle shadow
-        background: "rgba(20, 24, 40, 0.55)",
-        backdropFilter: "blur(18px)",
-        WebkitBackdropFilter: "blur(18px)",
-        borderRadius: "18px",
-        border: "1.5px solid rgba(255,255,255,0.13)",
-        boxShadow: "0 4px 32px 0 rgba(0,0,0,0.12)",
-      }}
+      // Remove style prop, use Tailwind for all styling
     >
       <header className="w-full">
-        {/* 
-          Make nav bar height a little bit smaller for mobile and tablet.
-          - h-14 for mobile/tablet (default)
-          - h-16 for large screens (lg and up)
-        */}
+        {/* Nav bar height: h-9 (mobile), h-12 (md), h-16 (lg) */}
         <nav className="flex w-full h-9 md:h-12 lg:h-16 items-center justify-between p-2 lg:p-4 rounded-lg">
           {/* Logo */}
           <div className="flex items-center">
@@ -169,14 +159,12 @@ const NavBar = () => {
               ref={logoRef}
               src="/img/logo.avif"
               alt="Logo"
-              className="w-[100px] h-auto filter invert"
-              /* Removed loading="lazy" and decoding="async" as per instructions */
-              style={{ filter: "invert(1) brightness(1.2)" }}
+              className="w-[100px] h-auto invert brightness-120"
+              // No style prop, use Tailwind for invert/brightness
             />
           </div>
           <div className="w-full flex items-center justify-end gap-5 lg:gap-6">
             {/* Desktop Navigation Links */}
-            {/* Responsive Desktop Navigation Links */}
             {showDesktopNav && (
               <div className="flex items-center gap-2.5 lg:gap-3">
                 {navLinks.map((item, index) => {
@@ -186,7 +174,7 @@ const NavBar = () => {
                         key={item}
                         href="/login"
                         ref={el => (navItemsRef.current[index] = el)}
-                        style={{ display: "inline-block" }}
+                        className="inline-block"
                         tabIndex={0}
                         onClick={handleLoginClick}
                       >
@@ -203,7 +191,7 @@ const NavBar = () => {
                       key={item}
                       href={`#${item.toLowerCase()}`}
                       ref={el => (navItemsRef.current[index] = el)}
-                      style={{ display: "inline-block" }}
+                      className="inline-block"
                       tabIndex={0}
                     >
                       <Button
@@ -235,9 +223,11 @@ const NavBar = () => {
                 {[1, 2, 3, 4].map((bar) => (
                   <div
                     key={bar}
-                    className={clsx("indicator-line", {
-                      active: isIndicatorActive,
-                    })}
+                    className={clsx(
+                      "w-1 h-4 mx-0.5 rounded bg-yellow-400 transition-all duration-200",
+                      "indicator-line",
+                      { "opacity-100": isIndicatorActive, "opacity-40": !isIndicatorActive }
+                    )}
                     style={{
                       animationDelay: `${bar * 0.1}s`,
                     }}
@@ -300,7 +290,6 @@ const NavBar = () => {
                     className="block w-full"
                     ref={el => (navItemsRef.current[idx + navLinks.length] = el)}
                     tabIndex={0}
-                    style={{ display: "block" }}
                   >
                     <Button
                       bullet={<GiClothesline />}
@@ -318,7 +307,6 @@ const NavBar = () => {
                   className="block w-full"
                   ref={el => (navItemsRef.current[idx + navLinks.length] = el)}
                   tabIndex={0}
-                  style={{ display: "block" }}
                 >
                   <Button
                     bullet={<GiClothesline />}

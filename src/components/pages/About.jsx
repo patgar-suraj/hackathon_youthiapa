@@ -4,24 +4,26 @@ import { ScrollTrigger } from "gsap/all";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const isTouchDevice = () => {
-  if (typeof window === "undefined") return false;
-  return (
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0 ||
-    navigator.msMaxTouchPoints > 0
-  );
-};
-
 const About = () => {
   const lookRef = useRef(null);
   const exclusiveRef = useRef(null);
+  const maskClipRef = useRef(null);
 
   useLayoutEffect(() => {
     let clipTimeline = null;
 
-    // Only run ScrollTrigger-based animation on non-touch devices
-    if (!isTouchDevice()) {
+    // Always run ScrollTrigger-based animation on all devices (mobile, tablet, desktop)
+    if (maskClipRef.current) {
+      // Set initial state for animation
+      // Set initial state for animation, width 50vw on laptop view (min-width: 1024px), else 80vw
+      const isLaptop = window.matchMedia("(min-width: 1024px)").matches;
+      gsap.set(maskClipRef.current, {
+        width: isLaptop ? "30vw" : "80vw",
+        height: isLaptop ? "30vw" : "100vw",
+        borderRadius: "32px",
+        overwrite: "auto",
+      });
+
       clipTimeline = gsap.timeline({
         scrollTrigger: {
           trigger: "#clip",
@@ -33,23 +35,16 @@ const About = () => {
         },
       });
 
-      clipTimeline.to(".mask-clip-path", {
+      clipTimeline.to(maskClipRef.current, {
         width: "100vw",
         height: "100vh",
         borderRadius: 0,
         overwrite: "auto",
-      });
-    } else {
-      // On mobile/tablet, just set the final state (no scroll animation)
-      gsap.set(".mask-clip-path", {
-        width: "100vw",
-        height: "100vh",
-        borderRadius: 0,
-        overwrite: "auto",
+        ease: "power1.inOut",
       });
     }
 
-    // Fade in/out for subtext p tags (still works on all devices)
+    // Fade in/out for subtext p tags (works on all devices)
     const fadeLines = gsap.utils.toArray(".fadeLine");
     fadeLines.forEach((el) => {
       gsap.fromTo(
@@ -119,6 +114,7 @@ const About = () => {
       gsap.killTweensOf(fadeLines);
       gsap.killTweensOf(lookRef.current);
       gsap.killTweensOf(exclusiveRef.current);
+      gsap.killTweensOf(maskClipRef.current);
     };
   }, []);
 
@@ -134,20 +130,20 @@ const About = () => {
           Animated heading: "Look" comes first, then "Exclusive->" with bounce
         */}
         <h2 className="!text-[#121212] text-center p-10 text-2xl sm:text-4xl md:text-6xl font-bold flex flex-wrap justify-center items-center gap-2">
-          <span
+          <p
             ref={exclusiveRef}
             style={{ display: "inline-block", whiteSpace: "nowrap" }}
-            className="exclusive-text font-saintCarell text-4xl md:text-6xl lg:text-8xl"
+            className="exclusive-text font-saintCarell text-3xl md:text-5xl lg:text-7xl"
           >
-            Exclusive-&gt;
-          </span>
-          <span
+            EXCLUSIVE-&gt;
+          </p>
+          <p
             ref={lookRef}
             style={{ display: "inline-block", whiteSpace: "nowrap" }}
-            className="look-text font-saintCarell text-4xl md:text-6xl lg:text-8xl"
+            className="look-text font-saintCarell text-3xl md:text-5xl lg:text-7xl"
           >
-            Look
-          </span>
+            LOOK
+          </p>
         </h2>
 
         <div className="about-subtext">
@@ -160,11 +156,23 @@ const About = () => {
         </div>
       </div>
 
-      <div className="h-dvh w-screen" id="clip">
-        <div className="mask-clip-path about-video">
+      <div className="h-dvh w-screen overflow-x-hidden" id="clip">
+        <div
+          ref={maskClipRef}
+          className="mask-clip-path about-video"
+          style={{
+            // fallback for mobile: initial state for animation
+            width: "100vw",
+            height: "100vh",
+            borderRadius: 0,
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
           <img
             src="/aboutimg/bb.webp"
             className="absolute left-0 top-0 size-full object-cover"
+            alt=""
           />
         </div>
       </div>
