@@ -343,7 +343,7 @@ const Offer = () => {
             tabIndex={0}
             aria-label="Previous"
             role="button"
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "none" }}
           >
             <TbArrowLoopLeft className="group-active:scale-95" />
           </div>
@@ -369,7 +369,7 @@ const Offer = () => {
             tabIndex={0}
             aria-label="Next"
             role="button"
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "none" }}
           >
             <TbArrowIteration className="group-active:scale-95" />
           </div>
